@@ -424,7 +424,7 @@ window.ECK_DATA = {"generated_at": "2026-07-02 09:01", "months": ["2026-01", "20
 <script>window.MEMOS=window.MEMOS||null;</script>
 <script>
 /* 새 버전 자동 반영: 배포 시 주입된 빌드토큰과 ver.txt(캐시 우회) 비교 → 다르면 최신으로 새로고침 */
-window.__BUILD__='20260702-115411';
+window.__BUILD__='20260702-115709';
 (function(){
   try{
     if(location.protocol==='file:') return;            // 로컬은 패스
@@ -1764,7 +1764,7 @@ function vocByStore(qMonths){
     else x['기타']++; });   // 단순 문의·칭찬 키워드 없는 건, 시스템·멤버십 문의 등은 기타로
   return {by:Object.values(by),total:recs.length};
 }
-// 포상 (매장당 균일 — 간식비 지원 + 표창 + 그룹웨어 우수사례 공유, 필요 시 금액만 수정)
+// 포상 (매장당 균일 — 간식비 지원 + 그룹웨어 우수사례 공유, 필요 시 금액만 수정)
 const REWARD_PER_STORE=100000;                 // 매장당 포상 경비 (원)
 const REWARD_ITEMS='매장당 간식비 10만원 지원 · 그룹웨어 우수사례 전사 공유';
 const REWARD_SHORT='간식비 10만원 · 그룹웨어 우수사례 공유';
