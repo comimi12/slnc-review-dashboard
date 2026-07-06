@@ -449,7 +449,7 @@ window.ECK_DATA = {"generated_at": "2026-07-06 09:00", "months": ["2026-01", "20
 <script>window.MEMOS=window.MEMOS||null;</script>
 <script>
 /* 새 버전 자동 반영: 배포 시 주입된 빌드토큰과 ver.txt(캐시 우회) 비교 → 다르면 최신으로 새로고침 */
-window.__BUILD__='20260706-164800';
+window.__BUILD__='20260706-174212';
 (function(){
   try{
     if(location.protocol==='file:') return;            // 로컬은 패스
@@ -848,6 +848,7 @@ window.__BUILD__='20260706-164800';
       <span>브랜드</span>
       <select id="vcs-brand"></select>
       <span class="ctrl-note" id="vcs-meta"></span>
+      <button id="vcs-xls" class="ghost" style="margin-left:auto">⬇ 엑셀 다운로드</button>
     </div>
     <div class="kpis" id="vcs-kpi"></div>
     <div class="panel" style="margin-bottom:14px;overflow-x:auto"><h3 id="vcs-gridttl">매장별 점검 현황</h3><div id="vcs-grid"></div></div>
@@ -864,6 +865,7 @@ window.__BUILD__='20260706-164800';
       <span>브랜드</span>
       <select id="vqscs-brand"></select>
       <span class="ctrl-note" id="vqscs-meta"></span>
+      <button id="vqscs-xls" class="ghost" style="margin-left:auto">⬇ 엑셀 다운로드</button>
     </div>
     <div class="kpis" id="vqscs-kpi"></div>
     <div id="vqscs-body"></div>
@@ -1531,6 +1533,65 @@ function renderVqscs(fromM,toM){
     body.innerHTML=h+'</tbody></table></div>';
   }
 }
+
+/* ---------- VIEW 5/6: 엑셀(CSV) 다운로드 ---------- */
+function downloadCsv(rows, filename){
+  const esc=v=>{ v=(v==null?'':String(v)); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+  const csv='﻿'+rows.map(r=>r.map(esc).join(',')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}), url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click();
+  document.body.removeChild(a); setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function exportVcs(){
+  if(!ECK){ alert('ECK 데이터가 없습니다.'); return; }
+  const months=eckR(vcsFrom,vcsTo); if(!months.length){ alert('조회된 기간이 없습니다.'); return; }
+  const brand=vcsBrand, single=months.length===1; let rows=[];
+  if(single){
+    const mo=months[0], cs=ECK.cs[mo]||{stores:[],days:[]};
+    const days=cs.days&&cs.days.length?cs.days:Array.from({length:(ECK.days_in_month[mo]||31)},(_,i)=>i+1);
+    const el=monthFullDays(mo);
+    const stores=cs.stores.filter(s=>brand==='전체'||s.brand===brand).sort((a,b)=>a.brand<b.brand?-1:a.brand>b.brand?1:(a.store<b.store?-1:1));
+    rows.push(['브랜드','매장명',...days.map(d=>d+'일'),'완료율(%)']);
+    stores.forEach(s=>{ const r=el?Math.round(doneUpto(s,el)/el*100):0;
+      rows.push([s.brand,s.store,...days.map(d=>s.days[d]?'O':''),el?r:'']); });
+    downloadCsv(rows,`CS체크리스트_${mo}_${brand}.csv`);
+  } else {
+    const csByMo={}, unionMap={};
+    months.forEach(mo=>{ const m={}; (ECK.cs[mo]?ECK.cs[mo].stores:[]).forEach(s=>{m[s.store]=s; unionMap[s.store]=unionMap[s.store]||{store:s.store,brand:s.brand};}); csByMo[mo]=m; });
+    const stores=Object.values(unionMap).filter(s=>brand==='전체'||s.brand===brand).sort((a,b)=>a.brand<b.brand?-1:a.brand>b.brand?1:(a.store<b.store?-1:1));
+    const rateOf=(store,mo)=>{ const s=csByMo[mo][store]; if(!s) return null; const el=monthFullDays(mo); return el?Math.round(doneUpto(s,el)/el*100):null; };
+    rows.push(['브랜드','매장명',...months.map(mo=>mo.slice(5)+'월(%)'),'평균(%)']);
+    stores.forEach(st=>{ let s=0,c=0; const cells=months.map(mo=>{const r=rateOf(st.store,mo); if(r!=null){s+=r;c++;} return r==null?'':r;});
+      rows.push([st.brand,st.store,...cells,c?Math.round(s/c):'']); });
+    downloadCsv(rows,`CS체크리스트_${vcsFrom}~${vcsTo}_${brand}.csv`);
+  }
+}
+function exportVqscs(){
+  if(!ECK){ alert('ECK 데이터가 없습니다.'); return; }
+  const months=eckR(vqscsFrom,vqscsTo); if(!months.length){ alert('조회된 기간이 없습니다.'); return; }
+  const brand=vqscsBrand, single=months.length===1; let rows=[];
+  if(single){
+    const mo=months[0], q=ECK.qscs[mo]||{registered:[],not_registered:[]};
+    const reg=q.registered.filter(s=>brand==='전체'||s.brand===brand), nreg=q.not_registered.filter(s=>brand==='전체'||s.brand===brand);
+    const all=[...reg.map(s=>({...s,reg:true})),...nreg.map(s=>({...s,reg:false}))].sort((a,b)=>a.brand<b.brand?-1:a.brand>b.brand?1:(a.store<b.store?-1:1));
+    rows.push(['브랜드','매장명','등록여부','등록일']);
+    all.forEach(s=>rows.push([s.brand,s.store,s.reg?'등록':'미등록',s.reg?(s.date||''):'']));
+    downloadCsv(rows,`QSCS교육일지_${mo}_${brand}.csv`);
+  } else {
+    const unionMap={}, regByMo={};
+    months.forEach(mo=>{ const qq=ECK.qscs[mo]||{registered:[],not_registered:[]}, set=new Set();
+      qq.registered.forEach(s=>{set.add(s.store); unionMap[s.store]=unionMap[s.store]||{store:s.store,brand:s.brand};});
+      qq.not_registered.forEach(s=>{ unionMap[s.store]=unionMap[s.store]||{store:s.store,brand:s.brand}; });
+      regByMo[mo]=set; });
+    const stores=Object.values(unionMap).filter(s=>brand==='전체'||s.brand===brand).sort((a,b)=>a.brand<b.brand?-1:a.brand>b.brand?1:(a.store<b.store?-1:1));
+    rows.push(['브랜드','매장명',...months.map(mo=>mo.slice(5)+'월'),`등록(/${months.length})`]);
+    stores.forEach(s=>{ let c=0; const cells=months.map(mo=>{const ok=regByMo[mo].has(s.store); if(ok)c++; return ok?'O':'';});
+      rows.push([s.brand,s.store,...cells,c]); });
+    downloadCsv(rows,`QSCS교육일지_${vqscsFrom}~${vqscsTo}_${brand}.csv`);
+  }
+}
+document.getElementById('vcs-xls')?.addEventListener('click',exportVcs);
+document.getElementById('vqscs-xls')?.addEventListener('click',exportVqscs);
 
 if(ECK && ECK.months && ECK.months.length){
   const allCs=[]; ECK.months.forEach(mo=>(ECK.cs[mo]?ECK.cs[mo].stores:[]).forEach(s=>allCs.push(s)));
