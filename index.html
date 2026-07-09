@@ -453,7 +453,7 @@ window.KPI_DATA = {"generated_at": "2026-07-09 08:46", "months": ["2026-01", "20
 </script>
 <script>
 /* 새 버전 자동 반영: 배포 시 주입된 빌드토큰과 ver.txt(캐시 우회) 비교 → 다르면 최신으로 새로고침 */
-window.__BUILD__='20260709-092741';
+window.__BUILD__='20260709-101132';
 (function(){
   try{
     if(location.protocol==='file:') return;            // 로컬은 패스
@@ -2097,7 +2097,7 @@ function kpiExcel(){
   const cols=`<Column ss:Width="120"/><Column ss:Width="60"/>`+Array.from({length:24},()=>`<Column ss:Width="34"/>`).join('')+`<Column ss:Width="60"/><Column ss:Width="46"/>`;
   const xml=`<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?>`
     +`<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">`
-    +styles+`<Worksheet ss:Name="서비스"><Table>${cols}${titleRow}${numRow}${hdr}${body}</Table></Worksheet></Workbook>`;
+    +styles+`<Worksheet ss:Name="서비스"><Table>${cols}<Row/>${titleRow}${numRow}${hdr}${body}</Table></Worksheet></Workbook>`;
   const blob=new Blob(['﻿'+xml],{type:'application/vnd.ms-excel'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='2026 월별 KPI 취합_서비스.xls';
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
