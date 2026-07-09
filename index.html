@@ -453,7 +453,7 @@ window.KPI_DATA = {"generated_at": "2026-07-09 08:46", "months": ["2026-01", "20
 </script>
 <script>
 /* 새 버전 자동 반영: 배포 시 주입된 빌드토큰과 ver.txt(캐시 우회) 비교 → 다르면 최신으로 새로고침 */
-window.__BUILD__='20260709-090953';
+window.__BUILD__='20260709-091302';
 (function(){
   try{
     if(location.protocol==='file:') return;            // 로컬은 패스
@@ -2029,11 +2029,12 @@ function renderKPI(mon){
   if(computed && Array.isArray(KPI.new_stores) && KPI.new_stores.length && mon===KPI.default_month)
     h+=`<div style="font-size:11.5px;color:var(--muted);margin-top:8px">🆕 ECK CS 신규 매장 후보 ${KPI.new_stores.length}개: ${KPI.new_stores.join(' · ')} <span style="opacity:.7">(데이터 확인 후 편입)</span></div>`;
   h+=`</div>`;
-  h+=`<div class="rep-sec"><table class="rep-tbl"><thead><tr><th style="width:44px">등급</th><th class="num" style="width:52px">점수</th><th>매장</th><th>브랜드</th><th>운영담당</th><th class="num">리뷰</th><th class="num">VOC</th><th class="num">불만</th><th class="num">불만율</th></tr></thead><tbody>`;
+  h+=`<div class="rep-sec"><table class="rep-tbl"><thead><tr><th style="width:44px">등급</th><th class="num" style="width:52px">점수</th><th>매장</th><th>브랜드</th><th>운영담당</th><th class="num">건수<span style="font-weight:400;font-size:10px;color:var(--muted)"> 리뷰+VOC</span></th><th class="num">불만</th><th class="num">불만율</th></tr></thead><tbody>`;
   rows.forEach(r=>{
     const bg=GRADE_BG[r.grade]||'';
     const noData = computed && r['불만율']==null ? (r['복합']? ' <span style="color:var(--muted);font-size:11px">(표본부족)</span>':' <span style="color:var(--muted);font-size:11px">(데이터無)</span>') : '';
-    h+=`<tr style="background:${bg}"><td>${kpiBadge(r.grade)}</td><td class="num"><b>${r.score==null?'–':r.score}</b></td><td class="st">${r.store}${noData}</td><td>${r.brand||''}</td><td>${r['운영담당']||''}</td><td class="num">${r.reviews_total==null?'–':fmt(r.reviews_total)}</td><td class="num">${r.voc_total==null?'–':fmt(r.voc_total)}</td><td class="num">${r['불만']==null?'–':r['불만']}</td><td class="num">${r['불만율']==null?'–':r['불만율']+'%'}</td></tr>`;
+    const cnt = (r.reviews_total==null && r.voc_total==null) ? null : (r['복합']!=null ? r['복합'] : (r.reviews_total||0)+(r.voc_total||0));
+    h+=`<tr style="background:${bg}"><td>${kpiBadge(r.grade)}</td><td class="num"><b>${r.score==null?'–':r.score}</b></td><td class="st">${r.store}${noData}</td><td>${r.brand||''}</td><td>${r['운영담당']||''}</td><td class="num">${cnt==null?'–':fmt(cnt)}</td><td class="num">${r['불만']==null?'–':r['불만']}</td><td class="num">${r['불만율']==null?'–':r['불만율']+'%'}</td></tr>`;
   });
   h+=`</tbody></table></div>`;
   box.innerHTML=h;
