@@ -453,7 +453,7 @@ window.KPI_DATA = {"generated_at": "2026-07-09 08:46", "months": ["2026-01", "20
 </script>
 <script>
 /* 새 버전 자동 반영: 배포 시 주입된 빌드토큰과 ver.txt(캐시 우회) 비교 → 다르면 최신으로 새로고침 */
-window.__BUILD__='20260709-091302';
+window.__BUILD__='20260709-092741';
 (function(){
   try{
     if(location.protocol==='file:') return;            // 로컬은 패스
@@ -2041,37 +2041,65 @@ function renderKPI(mon){
 }
 // 엑셀 다운로드 (SpreadsheetML .xls — Excel 네이티브, 외부 의존 없음)
 function gradeOfScore(sc){ if(sc==null)return''; if(sc>=100)return'S'; if(sc>=90)return'A'; if(sc>=80)return'B'; if(sc>=70)return'C'; return'D'; }
-// 엑셀 다운로드 — 취합엑셀 '서비스' 시트 원본 양식(브랜드그룹 순서, 신규=브랜드끝, 폐점=하단, 1~5월 엑셀값·6월~ 신규조건). SpreadsheetML .xls
+// 엑셀 다운로드 — 취합엑셀 '서비스' 시트 템플릿 재현(제목·번호행·연파랑 헤더·테두리·우측 등급기준표,
+//   브랜드그룹 순서·신규=브랜드끝·폐점=하단, 1~5월 엑셀값·6월~ 신규조건). 서식형 SpreadsheetML .xls
 function kpiExcel(){
   if(!KPI) return;
-  const months=KPI.months;
-  const map={};   // store → {mgr, cells:{mon:{score,grade}}}  (액티브 매장)
-  months.forEach(mon=>{ (KPI.by_month[mon].rows||[]).forEach(r=>{
+  const map={};   // store → {mgr, cells:{'2026-MM':{score,grade}}}  (액티브)
+  KPI.months.forEach(mon=>{ (KPI.by_month[mon].rows||[]).forEach(r=>{
     const e=map[r.store]||(map[r.store]={mgr:r['운영담당']||'',cells:{}});
     e.cells[mon]={score:r.score,grade:r.grade};
     if(r['운영담당']) e.mgr=r['운영담당'];
   }); });
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  const cS=v=>`<Cell><Data ss:Type="String">${esc(v)}</Data></Cell>`;
-  const cN=v=>(v==null||v==='')?`<Cell><Data ss:Type="String"></Data></Cell>`:`<Cell><Data ss:Type="Number">${v}</Data></Cell>`;
-  let hdr='<Row>'+cS('조직')+cS('운영담당');
-  months.forEach(mon=>{ hdr+=cS(parseInt(mon.slice(5),10)+'월')+cS('등급'); });
-  hdr+=cS('평균점수')+cS('등급')+'</Row>';
-  const rowXml=(store,mgr,getCell)=>{
-    let row='<Row>'+cS(store)+cS(mgr), sum=0, cnt=0;
-    months.forEach(mon=>{ const c=getCell(mon)||{}; row+=cN(c.score)+cS(c.grade||''); if(c.score!=null){sum+=c.score;cnt++;} });
-    const avg=cnt?Math.round(sum/cnt):null;
-    return row+cN(avg)+cS(avg==null?'':gradeOfScore(avg))+'</Row>';
+  const C=(v,st,idx)=>{ const i=idx?` ss:Index="${idx}"`:''; const s=st?` ss:StyleID="${st}"`:'';
+    if(v===''||v==null) return `<Cell${i}${s}/>`;
+    const num=(typeof v==='number'); return `<Cell${i}${s}><Data ss:Type="${num?'Number':'String'}">${num?v:esc(v)}</Data></Cell>`; };
+  const MON=['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06','2026-07','2026-08','2026-09','2026-10','2026-11','2026-12'];
+  // 등급 기준표(우측) + 확정월 매장수 분포
+  const dm=KPI.default_month, dist={S:0,A:0,B:0,C:0,D:0};
+  (KPI.by_month[dm]?KPI.by_month[dm].rows:[]).forEach(r=>{if(r.grade)dist[r.grade]++;});
+  const LEG=[['S',100,'0.04',dist.S],['A','90~99','0.05',dist.A],['B','80~89','0.81',dist.B],['C','70~79','0.05',dist.C],['D','69 이하','0.05',dist.D]];
+  // 데이터 행 (조직 col2 시작, 월 12개, 평균점수/등급). legendRow: 있으면 우측(col31~) 기준표 셀 추가
+  const dataRow=(store,mgr,getCell,legIdx)=>{
+    let row='<Row>'+C(store,'st',2)+C(mgr,'c'), sum=0, cnt=0;
+    MON.forEach(mon=>{ const c=getCell(mon)||{}; row+=C(c.score==null?'':c.score,'c')+C(c.grade||'','c'); if(c.score!=null){sum+=c.score;cnt++;} });
+    const avg=cnt?Math.round(sum/cnt):'';
+    row+=C(avg===''?'':avg,'avg')+C(avg===''?'':gradeOfScore(avg),'avg');
+    if(legIdx!=null && legIdx<LEG.length){ const g=LEG[legIdx];
+      row+=C(g[0],'g'+g[0],31)+C(g[1],'c')+C(g[2],'c')+C(g[3],'c'); }
+    return row+'</Row>';
   };
-  let body='';
-  // 액티브 매장: 원본 순서(브랜드 그룹 + 신규 브랜드끝)
+  // 헤더 행들
+  const numRow='<Row>'+Array.from({length:28},(_,i)=>C(i+1,'num',i===0?2:undefined)).join('')+'</Row>';
+  let hdr='<Row>'+C('조직','hdr',2)+C('운영담당','hdr');
+  MON.forEach((_,i)=>{ hdr+=C((i+1)+'월','hdr')+C('등급','hdr'); });
+  hdr+=C('평균점수','hdr')+C('등급','hdr')+C('등급','hdr',31)+C('점수','hdr')+C('기준','hdr')+C('매장 수(비율대비)','hdr')+'</Row>';
+  const titleRow='<Row>'+C('▣ 서비스 점수','tit',2)+'</Row>';
+  // 본문: 액티브(원본순서) → 폐점(하단)
   const order=(KPI.download_order&&KPI.download_order.length)?KPI.download_order:Object.keys(map).sort();
-  order.forEach(st=>{ const e=map[st]; if(e) body+=rowXml(st,e.mgr,mon=>e.cells[mon]); });
-  // 폐점 매장: 하단 블록 (1~5월 엑셀값, 6월~ 공란)
-  (KPI.closed||[]).forEach(c=>{ body+=rowXml(c.store, c['운영담당']||'', mon=>(c.months||{})[mon]); });
-  const xml=`<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="서비스"><Table>${hdr}${body}</Table></Worksheet></Workbook>`;
+  let li=0, body='';
+  order.forEach(st=>{ const e=map[st]; if(e){ body+=dataRow(st,e.mgr,m=>e.cells[m], li<LEG.length?li:null); li++; } });
+  (KPI.closed||[]).forEach(c=>{ body+=dataRow(c.store,c['운영담당']||'',m=>(c.months||{})[m], li<LEG.length?li:null); li++; });
+  // 스타일
+  const BRD='<Borders><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/></Borders>';
+  const GC={S:'#C8991F',A:'#2F9E6F',B:'#5B6B7D',C:'#E0772B',D:'#D64545'};
+  const gStyles=Object.keys(GC).map(g=>`<Style ss:ID="g${g}"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="${GC[g]}" ss:Pattern="Solid"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/>${BRD}</Style>`).join('');
+  const styles=`<Styles>`
+    +`<Style ss:ID="Default"><Alignment ss:Vertical="Center"/><Font ss:FontName="맑은 고딕" ss:Size="10"/></Style>`
+    +`<Style ss:ID="tit"><Font ss:Bold="1" ss:Size="13"/></Style>`
+    +`<Style ss:ID="num"><Font ss:Size="8" ss:Color="#999999"/><Alignment ss:Horizontal="Center"/></Style>`
+    +`<Style ss:ID="hdr"><Font ss:Bold="1"/><Interior ss:Color="#DDEBF7" ss:Pattern="Solid"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/>${BRD}</Style>`
+    +`<Style ss:ID="c"><Alignment ss:Horizontal="Center"/>${BRD}</Style>`
+    +`<Style ss:ID="st"><Alignment ss:Horizontal="Left"/>${BRD}</Style>`
+    +`<Style ss:ID="avg"><Font ss:Bold="1"/><Interior ss:Color="#F2F2F2" ss:Pattern="Solid"/><Alignment ss:Horizontal="Center"/>${BRD}</Style>`
+    +gStyles+`</Styles>`;
+  const cols=`<Column ss:Width="120"/><Column ss:Width="60"/>`+Array.from({length:24},()=>`<Column ss:Width="34"/>`).join('')+`<Column ss:Width="60"/><Column ss:Width="46"/>`;
+  const xml=`<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?>`
+    +`<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">`
+    +styles+`<Worksheet ss:Name="서비스"><Table>${cols}${titleRow}${numRow}${hdr}${body}</Table></Worksheet></Workbook>`;
   const blob=new Blob(['﻿'+xml],{type:'application/vnd.ms-excel'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='KPI_서비스등급_2026.xls';
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='2026 월별 KPI 취합_서비스.xls';
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 (function initKPI(){
