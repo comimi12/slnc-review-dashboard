@@ -671,7 +671,7 @@ window.MANUALS={"generated":"2026-08-02 06:22","root":"C:\\Users\\owner\\Desktop
 </script>
 <script>
 /* 새 버전 자동 반영: 배포 시 주입된 빌드토큰과 ver.txt(캐시 우회) 비교 → 다르면 최신으로 새로고침 */
-window.__BUILD__='20260802-163502';
+window.__BUILD__='20260802-170007';
 (function(){
   try{
     if(location.protocol==='file:') return;            // 로컬은 패스
@@ -851,6 +851,9 @@ window.__BUILD__='20260802-163502';
     padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;text-decoration:none}
   .mlib-btn:hover{background:var(--brand);color:#fff;border-color:var(--brand)}
   .mlib-btn.done{background:var(--good);color:#fff;border-color:var(--good)}
+  .mlib-btn.open{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .mlib-btn.open:hover{filter:brightness(1.08)}
+  .mlib-btn.ghost{opacity:.55}                 /* https 공유 사이트: 파일 열기 불가 안내용 */
   .mlib-find{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}
   .mlib-find input{flex:1;min-width:220px;padding:8px 12px;border:1px solid var(--line);
     border-radius:8px;font-size:13px;background:var(--card);color:var(--ink)}
@@ -3070,6 +3073,11 @@ function kpiExcel(){
   const sz  = n => n>=1048576 ? (n/1048576).toFixed(1)+'MB' : Math.max(1,Math.round(n/1024))+'KB';
   const ROOT = M.root || '';
   const winPath = p => (ROOT ? ROOT + '\\' : '') + String(p).replace(/\//g,'\\');
+  /* 로컬(file://)로 열었을 때만 원본 파일을 바로 열 수 있다.
+     https(공유 사이트)에서는 브라우저가 file:// 이동을 차단하므로 '열기'를 만들지 않는다. */
+  const LOCAL = location.protocol === 'file:';
+  const fileURL = p => 'file:///' + encodeURI(((ROOT ? ROOT + '/' : '') + String(p)).replace(/\\/g,'/'))
+                         .replace(/#/g,'%23').replace(/\?/g,'%3F');
 
   let after = anchor;                       // 사이드바: 📐 플로어플랜 다음에 카테고리 버튼을 붙인다
   M.cats.forEach(cat=>{
@@ -3089,8 +3097,13 @@ function kpiExcel(){
           + `<span class="note">${esc(cat.desc)}</span></h2></div>`
           + `<div class="man-lead"><p>· 교육팀 매뉴얼 원본 <b>${cat.n}건</b>을 하위 항목으로 분류했습니다. `
           + `제목을 누르면 원문에서 뽑은 <b>목차·요약</b>이 열립니다.</p>`
-          + `<p>· 원본 위치 : <code>${esc(ROOT)}</code> — 사내 문서보안(DRM) 문서라 파일 자체는 동봉하지 않고 `
-          + `<b>경로 복사</b> 버튼으로 바로 찾아갈 수 있게 했습니다.</p></div>`
+          + `<p>· 원본 위치 : <code>${esc(ROOT)}</code> — 사내 문서보안(DRM) 문서라 파일 자체는 동봉하지 않습니다.</p>`
+          + (LOCAL
+              ? `<p>· <b>열기</b>를 누르면 내 PC의 원본 PDF·PPT가 바로 열립니다(이 파일을 로컬에서 열었을 때만 동작). `
+                + `열리지 않으면 <b>경로 복사</b> 후 탐색기 주소창에 붙여넣으세요.</p></div>`
+              : `<p>· <b>공유 사이트(웹 주소)에서는 PDF·PPT가 열리지 않습니다</b> — 브라우저 보안 정책상 웹페이지가 `
+                + `보는 사람 PC의 파일을 직접 열 수 없기 때문입니다. <b>경로 복사</b> 후 탐색기 주소창에 붙여넣거나, `
+                + `공유받은 <code>dashboard-share.html</code> 파일을 내 PC에 저장해서 열면 <b>열기</b> 버튼이 활성화됩니다.</p></div>`)
           + `<div class="mlib-find"><input type="search" placeholder="이 카테고리에서 매뉴얼 검색 (제목·브랜드·연도)">`
           + `<span class="hit"></span></div>`;
 
@@ -3106,6 +3119,11 @@ function kpiExcel(){
            + (it.b?`<span class="bbadge">${esc(it.b)}</span>`:'')
            + `<span class="acts">`
            + (it.s && it.s.length ? `<button class="mlib-btn doc">내용</button>` : '')
+           + (LOCAL
+               ? `<a class="mlib-btn open" href="${esc(fileURL(it.p))}" target="_blank" rel="noopener"
+                     title="원본 파일 열기 (${esc(winPath(it.p))})">열기</a>`
+               : `<button class="mlib-btn cp ghost" data-p="${esc(winPath(it.p))}"
+                     title="공유 사이트(https)에서는 브라우저 보안 정책상 내 PC 파일을 직접 열 수 없습니다. 경로를 복사해 탐색기 주소창에 붙여넣으세요.">열기</button>`)
            + `<button class="mlib-btn cp" data-p="${esc(winPath(it.p))}">경로 복사</button></span></div>`;
         if(it.s && it.s.length){
           h += `<div class="mlib-doc" hidden><b>${esc(it.n||'원문 목차')}</b><ol>`
@@ -3132,8 +3150,9 @@ function kpiExcel(){
       const cp = ev.target.closest('.mlib-btn.cp');
       if(cp){
         const p = cp.dataset.p;
+        const label = cp.dataset.label || (cp.dataset.label = cp.textContent);  // '열기'/'경로 복사' 원래 라벨 유지
         const done = ()=>{ cp.textContent='복사됨'; cp.classList.add('done');
-                           setTimeout(()=>{cp.textContent='경로 복사'; cp.classList.remove('done');},1400); };
+                           setTimeout(()=>{cp.textContent=label; cp.classList.remove('done');},1400); };
         if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(p).then(done,()=>prompt('경로',p)); }
         else { prompt('경로', p); }
       }
