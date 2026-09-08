@@ -1288,7 +1288,7 @@ window.SVC_MANUALS = {
 <script>/* manuals_images.js 없음 — 해당 기능은 표시되지 않습니다 */</script>
 <script>
 /* 새 버전 자동 반영: 배포 시 주입된 빌드토큰과 ver.txt(캐시 우회) 비교 → 다르면 최신으로 새로고침 */
-window.__BUILD__='20260908-183939';
+window.__BUILD__='20260908-184608';
 (function(){
   try{
     if(location.protocol==='file:') return;            // 로컬은 패스
@@ -1399,77 +1399,105 @@ window.__BUILD__='20260908-183939';
   .sortlbl{font-size:11.5px;color:var(--muted);font-weight:600;margin-right:2px}
   .seg .arr{margin-left:5px;font-size:10px;font-style:normal;opacity:.5}
   .seg button.on .arr{opacity:1}
-  /* ── 월간 회의 보고 (1장 요약 · 한 화면 고정) ── */
-  .wrap.wide{max-width:1660px;padding:14px 18px}
-  .mt{height:calc(100vh - 28px);display:grid;grid-template-rows:auto auto 1.1fr 1.25fr;gap:9px;overflow:hidden}
-  .mt-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .mt-hd h2{margin:0;font-size:18px;font-weight:800;color:var(--brand-deep);letter-spacing:-.01em}
-  .mt-hd select{font-size:13px;font-weight:700;padding:4px 10px;border:1px solid var(--line);border-radius:7px;background:var(--card);color:var(--ink)}
-  .mt-hd .sub{font-size:11.5px;color:var(--muted);font-weight:600}
-  .mt-hd .rt{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-  /* 전월 → 당월 비교 카드 */
-  .mt-cmp{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-  .mt-k{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 11px 8px;box-shadow:var(--shadow)}
-  .mt-k .l{font-size:10.5px;color:var(--muted);font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:5px}
-  .mt-k .l .d{margin-left:auto;font-size:10.5px;font-weight:800}
-  .mt-k .l .d.good{color:var(--good)} .mt-k .l .d.bad{color:var(--bad)} .mt-k .l .d.flat{color:var(--muted)}
-  .mt-k .nums{display:flex;align-items:baseline;gap:6px;line-height:1.2;margin-top:1px}
-  .mt-k .prev{font-size:12px;font-weight:700;color:#9aa8b8}
-  .mt-k .arw{font-size:11px;color:#c3cedb}
-  .mt-k .cur{font-size:19px;font-weight:800;color:var(--brand-deep)}
-  .mt-k .cur small{font-size:11px;font-weight:700;color:var(--muted);margin-left:1px}
-  .mt-k.warn .cur{color:var(--bad)}
-  .mt-bars{margin-top:5px;display:grid;gap:2px}
-  .mt-bars .bw{height:5px;border-radius:3px;background:#eef2f7;overflow:hidden}
-  .mt-bars .bw i{display:block;height:100%;border-radius:3px;background:#c3cedb}
-  .mt-bars .bw.cur i{background:var(--brand)}
-  .mt-k.warn .mt-bars .bw.cur i{background:var(--bad)}
-  /* 카드 공통 */
-  .mt-row{display:grid;gap:9px;min-height:0}
-  .mt-row.r3{grid-template-columns:1.12fr 1fr 1.08fr}
+  /* ── 월간 회의 보고 (대표 보고용 1장 요약 · 삼천리 스타일) ── */
+  .wrap.wide{max-width:1680px;padding:14px 20px}
+  .mt{--nv:#0F2F54;--nv2:#1F3864;--bl:#0B63CE;--ln:#dbe3ec;
+    height:calc(100vh - 28px);display:grid;grid-template-rows:auto auto 1fr 1.02fr;gap:11px;overflow:hidden;
+    font-family:"Malgun Gothic","맑은 고딕",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff}
+  /* 헤더 + 분절 파란 룰 */
+  .mt-hd{display:flex;align-items:flex-end;gap:11px;flex-wrap:wrap;border-bottom:2px solid var(--nv);padding-bottom:7px}
+  .mt-hd h2{margin:0;font-size:21px;font-weight:800;color:var(--nv);letter-spacing:-.02em;line-height:1}
+  .mt-hd .rule{display:inline-flex;gap:3px;align-items:center;margin-bottom:2px}
+  .mt-hd .rule i{display:block;height:3px;background:var(--bl);border-radius:1px}
+  .mt-hd .rule i:nth-child(1){width:22px} .mt-hd .rule i:nth-child(2){width:11px;opacity:.65} .mt-hd .rule i:nth-child(3){width:5px;opacity:.4}
+  .mt-hd select{font-size:13px;font-weight:700;padding:3px 9px;border:1px solid var(--ln);border-radius:5px;background:#fff;color:var(--nv)}
+  .mt-hd .sub{font-size:12px;color:#6b7a8d;font-weight:600}
+  .mt-hd .rt{margin-left:auto;display:flex;gap:7px;align-items:center;font-size:11.5px;color:#6b7a8d;font-weight:600}
+  /* 핵심 지표 4 */
+  .mt-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+  .mt-k{border:1px solid var(--ln);border-top:3px solid var(--nv);border-radius:4px;padding:9px 14px 10px;background:#fff}
+  .mt-k .l{font-size:11.5px;color:var(--nv2);font-weight:700;letter-spacing:.01em}
+  .mt-k .v{font-size:30px;font-weight:800;color:var(--nv);line-height:1.12;margin-top:1px;letter-spacing:-.02em}
+  .mt-k .v small{font-size:13px;font-weight:700;color:#6b7a8d;margin-left:2px}
+  .mt-k .cap{font-size:11px;color:#6b7a8d;font-weight:600;margin-top:2px}
+  .mt-k .cap b{font-weight:800}
+  .mt-k .cap b.good{color:#1e7a55} .mt-k .cap b.bad{color:#c0392b} .mt-k .cap b.flat{color:#8b98a8}
+  .mt-k.accent{border-top-color:var(--bl)} .mt-k.accent .v{color:var(--bl)}
+  .mt-k.risk{border-top-color:#c0392b} .mt-k.risk .v{color:#c0392b}
+  /* 카드 */
+  .mt-row{display:grid;gap:11px;min-height:0}
+  .mt-row.r3{grid-template-columns:1.25fr 1fr}
   .mt-row.r4{grid-template-columns:repeat(3,1fr)}
-  .mt-c{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:8px 11px 9px;box-shadow:var(--shadow);
+  .mt-c{border:1px solid var(--ln);border-radius:4px;padding:9px 14px 11px;background:#fff;
     display:flex;flex-direction:column;min-height:0;overflow:hidden}
-  .mt-c>h4{margin:0 0 6px;font-size:11.5px;font-weight:800;letter-spacing:.02em;color:var(--brand-deep);
-    display:flex;align-items:center;gap:6px}
-  .mt-c>h4 i{width:7px;height:7px;border-radius:2px;font-style:normal;background:var(--brand);flex:0 0 auto}
-  .mt-c>h4 b{margin-left:auto;font-size:10.5px;font-weight:700;color:var(--muted);white-space:nowrap}
-  .mt-c .bd{flex:1;min-height:0;overflow:auto}
-  .mt-ch{width:100%;flex:1;min-height:104px}
-  /* VOC 요약 리스트 */
-  .mt-vl{list-style:none;margin:0;padding:0;font-size:11.5px;line-height:1.45}
-  .mt-vl li{display:flex;gap:7px;align-items:center;padding:3.5px 0;border-bottom:1px solid #eef2f7}
-  .mt-vl li:last-child{border-bottom:0}
-  .mt-vl .t{flex:0 0 auto;background:#eef4fb;border:1px solid #d7e6f7;color:var(--brand-deep);font-size:10px;font-weight:700;border-radius:999px;padding:1px 7px}
-  .mt-vl .n{margin-left:auto;font-weight:800;color:var(--brand-deep);flex:0 0 auto}
-  .mt-sec{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.04em;margin:8px 0 3px}
-  .mt-sec:first-child{margin-top:0}
-  .mt-b{border-radius:9px;padding:6px 10px;font-size:11px;line-height:1.45;border:1px solid #f3c9c9;background:#fff5f5;
-    border-left:3px solid var(--bad);color:#28323f;margin-top:7px}
-  .mt-b .rl{display:inline-block;background:var(--bad);color:#fff;font-size:9.5px;font-weight:800;border-radius:5px;padding:1px 6px;margin-right:6px}
-  /* TOP3 매장 개선 카드 */
-  .mt-c.st>h4{color:var(--ink)}
-  .mt-c.st>h4 .rk{background:var(--brand-deep);color:#fff;border-radius:5px;font-size:10px;font-weight:800;padding:1px 6px;flex:0 0 auto}
-  .mt-lb{font-size:10px;font-weight:800;letter-spacing:.04em;color:var(--muted);margin:7px 0 3px}
-  .mt-lb:first-child{margin-top:0}
-  .mt-ul{list-style:none;margin:0;padding:0}
-  .mt-ul li{font-size:11.5px;line-height:1.5;margin:0 0 4px;padding-left:11px;position:relative;color:#28323f}
-  .mt-ul li:before{content:'';position:absolute;left:1px;top:6px;width:4px;height:4px;border-radius:50%;background:#c3cedb}
-  .mt-ul.act li:before{background:#1e7a55}
-  .mt-ul.cz li:before{background:#d64545}
-  .mt-dept{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px}
-  .mt-dept span{background:#eef4fb;border:1px solid #d7e6f7;color:var(--brand-deep);font-size:10px;font-weight:700;border-radius:999px;padding:1px 7px}
-  .mt-empty{font-size:11.5px;color:var(--muted);padding:6px 2px}
+  .mt-c>h4{margin:0 0 8px;font-size:12.5px;font-weight:800;color:var(--nv);display:flex;align-items:center;gap:7px;
+    padding-bottom:5px;border-bottom:1px solid var(--ln)}
+  .mt-c>h4 .rule{display:inline-flex;gap:2px;align-items:center;flex:0 0 auto}
+  .mt-c>h4 .rule i{display:block;height:3px;background:var(--bl);border-radius:1px}
+  .mt-c>h4 .rule i:nth-child(1){width:12px} .mt-c>h4 .rule i:nth-child(2){width:6px;opacity:.5}
+  .mt-c>h4 b{margin-left:auto;font-size:11px;font-weight:700;color:#6b7a8d;white-space:nowrap}
+  .mt-c .bd{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+  .mt-ch{width:100%;flex:1;min-height:96px}
+  /* 상세 버튼 */
+  .mt-more{border:1px solid var(--bl);background:#fff;color:var(--bl);font-size:11px;font-weight:800;
+    border-radius:4px;padding:3px 10px;cursor:pointer;white-space:nowrap;line-height:1.5}
+  .mt-more:hover{background:var(--bl);color:#fff}
+  .mt-c>h4 .mt-more{margin-left:auto}
+  .mt-c>h4 b+.mt-more{margin-left:8px}
+  /* 클레임 요약 칩 */
+  .mt-lb{font-size:10.5px;font-weight:800;color:#6b7a8d;letter-spacing:.04em;margin:0 0 5px}
+  .mt-lb+.mt-chips{margin-bottom:10px}
+  .mt-chips{display:flex;gap:5px;flex-wrap:wrap}
+  .mt-chips span{border:1px solid var(--ln);border-radius:3px;padding:3px 9px;font-size:11.5px;font-weight:700;color:var(--nv2);background:#f7fafd}
+  .mt-chips span em{font-style:normal;color:var(--bl);font-weight:800;margin-left:4px}
+  .mt-chips.warn span{border-color:#f0cfcd;background:#fdf6f5;color:#a33}
+  .mt-chips.warn span em{color:#c0392b}
+  .mt-crit{margin-top:auto;border:1px solid #f0cfcd;border-left:3px solid #c0392b;background:#fdf6f5;border-radius:3px;
+    padding:6px 10px;font-size:11.5px;line-height:1.45;color:#28323f}
+  .mt-crit .rl{display:inline-block;background:#c0392b;color:#fff;font-size:9.5px;font-weight:800;border-radius:3px;padding:1px 6px;margin-right:6px}
+  /* TOP3 매장 카드 */
+  .mt-c.st>h4{border-bottom-color:var(--nv);color:var(--nv)}
+  .mt-c.st>h4 .rk{background:var(--nv);color:#fff;border-radius:3px;font-size:10.5px;font-weight:800;padding:1px 7px;flex:0 0 auto}
+  .mt-c.st .nm{font-size:13px;font-weight:800;color:var(--nv);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mt-st-n{display:flex;align-items:baseline;gap:8px;margin:2px 0 9px}
+  .mt-st-n .big{font-size:24px;font-weight:800;color:#c0392b;line-height:1}
+  .mt-st-n .big small{font-size:12px;font-weight:700;color:#6b7a8d;margin-left:1px}
+  .mt-st-n .sub{font-size:11.5px;color:#6b7a8d;font-weight:600}
+  .mt-f{margin-bottom:8px}
+  .mt-f .k{font-size:10px;font-weight:800;letter-spacing:.04em;color:#fff;background:var(--nv2);border-radius:2px;padding:1px 6px;display:inline-block;margin-bottom:3px}
+  .mt-f .k.act{background:var(--bl)}
+  .mt-f .t{font-size:12px;line-height:1.5;color:#28323f}
+  .mt-c.st .foot{margin-top:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .mt-dept{display:flex;gap:4px;flex-wrap:wrap}
+  .mt-dept span{border:1px solid var(--ln);color:var(--nv2);font-size:10px;font-weight:700;border-radius:999px;padding:1px 7px;background:#f7fafd}
+  .mt-empty{font-size:12px;color:#8b98a8;padding:6px 2px}
+  /* 상세 모달 */
+  .sc-modal{position:fixed;inset:0;background:rgba(15,47,84,.42);z-index:80;display:none;align-items:center;justify-content:center;padding:26px}
+  .sc-modal.on{display:flex}
+  .sc-mbox{background:#fff;border-radius:6px;max-width:920px;width:100%;max-height:86vh;display:flex;flex-direction:column;
+    box-shadow:0 18px 48px rgba(15,47,84,.28);border-top:4px solid var(--brand-deep)}
+  .sc-mhd{display:flex;align-items:center;gap:10px;padding:13px 20px 11px;border-bottom:1px solid #dbe3ec}
+  .sc-mhd h3{margin:0;font-size:15px;font-weight:800;color:#0F2F54}
+  .sc-mhd .mt-more{margin-left:auto}
+  .sc-mhd button.x{margin-left:auto;border:0;background:#f2f6fb;color:#0F2F54;width:28px;height:28px;border-radius:5px;font-size:14px;cursor:pointer;font-weight:700}
+  .sc-mhd button.x:hover{background:#e3ecf7}
+  .sc-mbd{padding:14px 20px 18px;overflow:auto}
+  .sc-mbd h5{margin:14px 0 6px;font-size:11.5px;font-weight:800;color:#1F3864;letter-spacing:.03em}
+  .sc-mbd h5:first-child{margin-top:0}
+  .sc-mbd ul{margin:0;padding-left:17px}
+  .sc-mbd li{font-size:12.5px;line-height:1.62;margin:4px 0;color:#28323f}
+  .sc-mbd table{width:100%;border-collapse:collapse;font-size:12px}
+  .sc-mbd th{background:#f2f6fb;color:#1F3864;font-size:11px;font-weight:800;text-align:right;padding:6px 8px;border-bottom:1px solid #dbe3ec}
+  .sc-mbd th:first-child{text-align:left}
+  .sc-mbd td{padding:6px 8px;border-bottom:1px solid #eef2f7;text-align:right;white-space:nowrap}
+  .sc-mbd td:first-child{text-align:left;font-weight:700;white-space:normal}
   @media(max-width:1320px){
     .mt{height:auto;overflow:visible}
-    .mt-cmp{grid-template-columns:repeat(3,1fr)}
+    .mt-kpis{grid-template-columns:repeat(2,1fr)}
     .mt-row.r3,.mt-row.r4{grid-template-columns:1fr}
-    .mt-ch{min-height:190px}
+    .mt-ch{min-height:200px}
   }
-  @media print{
-    .mt{height:auto;overflow:visible}
-    .mt-c{box-shadow:none;break-inside:avoid}
-  }
+  @media print{ .mt{height:auto;overflow:visible} .mt-more{display:none} }
   .chart{width:100%;height:300px}
   .chart.sm{height:250px}
   .chart.lg{height:300px}
@@ -2409,22 +2437,34 @@ window.__BUILD__='20260908-183939';
     </div>
   </section>
 
-  <!-- 월간 회의 보고 (1장 요약) -->
+  <!-- 월간 회의 보고 (대표 보고용 1장 요약) -->
   <section class="view" id="vmeet">
     <div class="mt">
       <div class="mt-hd">
+        <span class="rule"><i></i><i></i><i></i></span>
         <h2>월간 회의 보고</h2>
         <select id="mt-month"></select>
         <span class="sub" id="mt-sub"></span>
-        <span class="rt"><span class="sub">① 브랜드별 리뷰 종합 · ② TOP3 불만매장 · ③ 고객의 소리 요약</span></span>
+        <span class="rt"><span id="mt-basis"></span><button class="mt-more" data-mt="kpi">지표 상세</button></span>
       </div>
-      <div class="mt-cmp" id="mt-cmp"></div>
+      <div class="mt-kpis" id="mt-kpis"></div>
       <div class="mt-row r3">
-        <div class="mt-c"><h4><i></i>불만 매장 TOP3 <b id="mt-top3-b"></b></h4><div class="mt-ch" id="c-mt-top3"></div></div>
-        <div class="mt-c"><h4><i style="background:#d64545"></i>리뷰 클레임 요약 <b id="mt-kw-b"></b></h4><div class="mt-ch" id="c-mt-kw"></div></div>
-        <div class="mt-c"><h4><i style="background:#8a5cd1"></i>VOC 클레임 요약 <b id="mt-voc-b"></b></h4><div class="bd" id="mt-voc"></div></div>
+        <div class="mt-c">
+          <h4><span class="rule"><i></i><i></i></span>불만 매장 TOP3<b id="mt-top3-b"></b><button class="mt-more" data-mt="top3">상세</button></h4>
+          <div class="mt-ch" id="c-mt-top3"></div>
+        </div>
+        <div class="mt-c">
+          <h4><span class="rule"><i></i><i></i></span>클레임 요약<button class="mt-more" data-mt="claim">상세</button></h4>
+          <div class="bd" id="mt-claim"></div>
+        </div>
       </div>
       <div class="mt-row r4" id="mt-stores"></div>
+    </div>
+    <div class="sc-modal" id="mt-modal">
+      <div class="sc-mbox">
+        <div class="sc-mhd"><h3 id="mt-mtitle"></h3><button class="x" id="mt-mclose">✕</button></div>
+        <div class="sc-mbd" id="mt-mbody"></div>
+      </div>
     </div>
   </section>
 
@@ -4321,132 +4361,179 @@ function kpiExcel(){
   }
 })();
 
-/* ---------- 월간 회의 보고 (1장 요약: 전월·당월 비교 / 불만 TOP3 / 클레임 요약 / 3개 매장 개선안) ---------- */
+/* ---------- 월간 회의 보고 (대표 보고용 1장 요약 · 상세는 버튼) ---------- */
 const MT_DEPTS=['영업팀','QC팀','R&D팀','서비스교육팀'];
 const mtMd=v=>String(v).replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+const mtTx=v=>String(v).replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'$1');
+function mtShort(v,n){ const t=mtTx(v).trim(); return t.length>n?t.slice(0,n-1).replace(/[\s(·,]+$/,'')+'…':t; }
+// 수치만 나열한 문장(‘불만 5건(196건 중 2.6%)…’)은 원인으로 부적합 → 실제 원인 문장을 고른다
+function mtPick(arr){ if(!arr||!arr.length) return null;
+  const stat=x=>/건\s?중|건\(|%\s*→|전월|불만율/.test(mtTx(x).slice(0,40));
+  return arr.find(x=>!stat(x)) || arr[0]; }
 function mtVocSum(o){ return o?((o['불만']||0)+(o['칭찬']||0)+(o['기타']||0)+(o['문의']||0)):0; }
 function mtPrev(m){ const i=R.months.indexOf(m); return i>0?R.months[i-1]:null; }
-// 전월 → 당월 비교 카드 (막대 2줄로 크기 비교까지 보이게)
-function mtCard(label,prev,cur,unit,goodWhenDown,warn){
-  let d='';
-  if(prev!=null&&cur!=null){
-    const s=Math.round((cur-prev)*10)/10;
-    const cls = (goodWhenDown===null||s===0)?'flat':((s>0)===!!goodWhenDown?'bad':'good');
-    d=`<span class="d ${cls}">${s>0?'▲':s<0?'▼':'–'}${Math.abs(s)}${unit==='%'?'%p':''}</span>`;
-  }
-  const mx=Math.max(prev||0,cur||0)||1;
-  const w=v=>Math.max(2,Math.round((v||0)/mx*100));
-  return `<div class="mt-k${warn?' warn':''}"><div class="l">${label}${d}</div>`
-    +`<div class="nums"><span class="prev">${prev==null?'–':fmt(prev)}</span><span class="arw">→</span>`
-    +`<span class="cur">${cur==null?'–':fmt(cur)}<small>${unit||''}</small></span></div>`
-    +`<div class="mt-bars"><div class="bw"><i style="width:${w(prev)}%"></i></div>`
-    +`<div class="bw cur"><i style="width:${w(cur)}%"></i></div></div></div>`;
+function mtRecs(m){ return (V&&V.records)?V.records.filter(r=>r.month===m):[]; }
+function mtCrit(m){ return mtRecs(m).filter(r=>r.critical&&r.category!=='칭찬'); }
+function mtDelta(prev,cur,unit,goodWhenDown){
+  if(prev==null||cur==null) return '<b class="flat">–</b>';
+  const s=Math.round((cur-prev)*10)/10;
+  const cls=(goodWhenDown===null||s===0)?'flat':((s>0)===!!goodWhenDown?'bad':'good');
+  return `<b class="${cls}">${s>0?'▲':s<0?'▼':'–'}${Math.abs(s)}${unit==='%'?'%p':unit||''}</b>`;
 }
-function mtRenderCmp(m){
+// ── 핵심 지표 4개만 (나머지는 '지표 상세' 버튼) ──
+function mtRenderKpis(m){
   const pm=mtPrev(m), t=R.by_month_total[m]||{}, p=pm?(R.by_month_total[pm]||{}):null;
-  const stCnt=x=>{let n=0;for(const s in R.store_month){const o=R.store_month[s][x];if(o&&o.total)n++;}return n;};
   const vc=(V&&V.by_month)?V.by_month[m]:null, vp=(V&&V.by_month&&pm)?V.by_month[pm]:null;
-  const crit=x=>(V&&V.records)?V.records.filter(r=>r.month===x&&r.critical&&r.category!=='칭찬').length:null;
-  document.getElementById('mt-cmp').innerHTML =
-     mtCard('리뷰',p?p.total:null,t.total,'건',null)
-    +mtCard('불만 리뷰',p?p['불만']:null,t['불만'],'건',true,true)
-    +mtCard('불만율',p?p['불만율']:null,t['불만율'],'%',true,true)
-    +mtCard('집계 매장',pm?stCnt(pm):null,stCnt(m),'개',null)
-    +mtCard('VOC 접수',vp?mtVocSum(vp):null,mtVocSum(vc),'건',null)
-    +mtCard('VOC 불만',vp?(vp['불만']||0):null,vc?(vc['불만']||0):0,'건',true,true);
+  const cn=mtCrit(m).length, cnp=pm?mtCrit(pm).length:null;
+  const card=(cls,l,v,unit,cap)=>`<div class="mt-k ${cls}"><div class="l">${l}</div>`
+    +`<div class="v">${v}${unit?`<small>${unit}</small>`:''}</div><div class="cap">${cap}</div></div>`;
+  document.getElementById('mt-kpis').innerHTML =
+     card('','리뷰 접수',fmt(t.total),'건',`전월 ${p?fmt(p.total):'–'}건 ${mtDelta(p?p.total:null,t.total,'건',null)}`)
+    +card('accent','불만율',t['불만율'],'%',`불만 ${t['불만']}건 · 전월 대비 ${mtDelta(p?p['불만율']:null,t['불만율'],'%',true)}`)
+    +card('','VOC 불만',vc?(vc['불만']||0):0,'건',`접수 ${mtVocSum(vc)}건 · 전월 대비 ${mtDelta(vp?(vp['불만']||0):null,vc?(vc['불만']||0):0,'건',true)}`)
+    +card(cn?'risk':'','크리티컬',cn,'건',cn?'즉시 조치 대상':'해당 없음');
   document.getElementById('mt-sub').textContent = pm?`${pm} 대비 ${m}`:m;
+  document.getElementById('mt-basis').textContent = '리뷰 · SL&C 고객의 소리 종합';
 }
-// 불만 매장 TOP3 (표본 10건 이상)
+// ── 불만 매장 TOP3 ──
 function mtTop3(m){ return aggStoreRange(m,m).filter(s=>s.total>=10)
   .sort((a,b)=>b['불만']-a['불만']||b['불만율']-a['불만율']||(a.store<b.store?-1:1)).slice(0,3); }
 function mtRenderTop3(m){
   const top=mtTop3(m);
   document.getElementById('mt-top3-b').textContent = top.length?'표본 10건 이상':'해당 없음';
-  const el=document.getElementById('c-mt-top3');
-  charts.mtTop3 = charts.mtTop3 || echarts.init(el);
-  const names=top.map(s=>s.store).reverse(), vals=top.map(s=>s['불만']).reverse(), rates=top.map(s=>s).reverse();
+  charts.mtTop3 = charts.mtTop3 || echarts.init(document.getElementById('c-mt-top3'));
+  const rev=top.slice().reverse();
   charts.mtTop3.setOption({
-    grid:{left:4,right:58,top:6,bottom:4,containLabel:true},
-    tooltip:{trigger:'item',formatter:p=>`${p.name}<br/>불만 <b>${p.value}건</b> / 총 ${fmt(rates[p.dataIndex].total)}건<br/>불만율 ${rates[p.dataIndex]['불만율']}%`},
-    xAxis:{type:'value',show:false,max:v=>v.max*1.35},
-    yAxis:{type:'category',data:names,axisLine:{show:false},axisTick:{show:false},
-      axisLabel:{fontSize:11,fontWeight:600,width:120,overflow:'truncate',color:'#28323f'}},
-    series:[{type:'bar',barWidth:'52%',data:vals.map((v,i)=>({value:v,itemStyle:{color:BRAND_COLOR[rates[i].brand]||'#d64545',borderRadius:[0,4,4,0]}})),
-      label:{show:true,position:'right',fontSize:11,fontWeight:700,
-        formatter:p=>`${p.value}건 · ${rates[p.dataIndex]['불만율']}%`}}]
+    grid:{left:4,right:62,top:6,bottom:4,containLabel:true},
+    tooltip:{trigger:'item',formatter:p=>`${p.name}<br/>불만 <b>${p.value}건</b> / 총 ${fmt(rev[p.dataIndex].total)}건<br/>불만율 ${rev[p.dataIndex]['불만율']}%`},
+    xAxis:{type:'value',show:false,max:v=>v.max*1.4},
+    yAxis:{type:'category',data:rev.map(s=>s.store),axisLine:{show:false},axisTick:{show:false},
+      axisLabel:{fontSize:11.5,fontWeight:700,width:132,overflow:'truncate',color:'#0F2F54'}},
+    series:[{type:'bar',barWidth:'46%',data:rev.map(s=>s['불만']),
+      itemStyle:{color:'#0B63CE',borderRadius:[0,3,3,0]},
+      label:{show:true,position:'right',fontSize:11.5,fontWeight:700,color:'#0F2F54',
+        formatter:p=>`${p.value}건 · ${rev[p.dataIndex]['불만율']}%`}}]
   },true);
 }
-// 리뷰 클레임 요약 (그 달 불만 키워드 상위 6)
-function mtRenderKw(m){
-  const kw=((R.by_month_keywords||{})[m]||{}).complaint||[];
-  const top=kw.slice(0,6);
-  document.getElementById('mt-kw-b').textContent = top.length?'불만 키워드 상위':'키워드 없음';
-  const el=document.getElementById('c-mt-kw');
-  charts.mtKw = charts.mtKw || echarts.init(el);
-  const names=top.map(x=>x[0]).reverse(), vals=top.map(x=>x[1]).reverse();
-  charts.mtKw.setOption({
-    grid:{left:4,right:34,top:6,bottom:4,containLabel:true},
-    tooltip:{trigger:'item',formatter:p=>`${p.name} <b>${p.value}건</b>`},
-    xAxis:{type:'value',show:false,max:v=>v.max*1.25},
-    yAxis:{type:'category',data:names,axisLine:{show:false},axisTick:{show:false},
-      axisLabel:{fontSize:11,fontWeight:600,color:'#28323f'}},
-    series:[{type:'bar',barWidth:'56%',itemStyle:{color:'#d64545',borderRadius:[0,4,4,0]},data:vals,
-      label:{show:true,position:'right',fontSize:11,fontWeight:700,formatter:'{c}건'}}]
-  },true);
-}
-// VOC 클레임 요약 (문의유형 · 집중 매장 · 크리티컬)
-function mtRenderVoc(m){
-  const box=document.getElementById('mt-voc');
-  if(!V||!V.records){ box.innerHTML='<div class="mt-empty">VOC 데이터 없음</div>'; return; }
-  const recs=V.records.filter(r=>r.month===m);
-  const b=document.getElementById('mt-voc-b');
-  const bad=recs.filter(r=>r.category==='불만').length;
-  b.textContent = recs.length?`접수 ${recs.length}건 · 불만 ${bad}건`:'접수 없음';
-  const cnt=(arr,f)=>{const o={};arr.forEach(r=>{const k=f(r)||'미분류';o[k]=(o[k]||0)+1;});
-    return Object.entries(o).sort((x,y)=>y[1]-x[1]);};
-  const ty=cnt(recs,r=>r.inquiry_type).slice(0,4);
-  const st=cnt(recs.filter(r=>r.category==='불만'),r=>r.store).slice(0,3);
-  const crit=recs.filter(r=>r.critical&&r.category!=='칭찬');
-  let h='';
-  h+='<div class="mt-sec">문의유형</div><ul class="mt-vl">'
-    +(ty.map(([k,n])=>`<li><span class="t">${k}</span><span class="n">${n}건</span></li>`).join('')||'<li><span class="mt-empty">없음</span></li>')+'</ul>';
-  h+='<div class="mt-sec">불만 집중 매장</div><ul class="mt-vl">'
-    +(st.map(([k,n])=>`<li>${k}<span class="n">${n}건</span></li>`).join('')||'<li><span class="mt-empty">없음</span></li>')+'</ul>';
-  h+=crit.slice(0,2).map(r=>`<div class="mt-b"><span class="rl">크리티컬</span>${r.store||''} — ${(r.title||'').replace(/</g,'&lt;')}</div>`).join('');
+// ── 클레임 요약 (리뷰 키워드 + VOC 유형 + 크리티컬 1줄) ──
+function mtRenderClaim(m){
+  const box=document.getElementById('mt-claim');
+  const kw=(((R.by_month_keywords||{})[m]||{}).complaint||[]).slice(0,5);
+  const recs=mtRecs(m), o={};
+  recs.forEach(r=>{const k=r.inquiry_type||'미분류';o[k]=(o[k]||0)+1;});
+  const ty=Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  const crit=mtCrit(m);
+  let h='<div class="mt-lb">리뷰 불만 키워드</div><div class="mt-chips warn">'
+    +(kw.map(([k,n])=>`<span>${k}<em>${n}</em></span>`).join('')||'<span>해당 없음</span>')+'</div>';
+  h+='<div class="mt-lb">VOC 문의유형</div><div class="mt-chips">'
+    +(ty.map(([k,n])=>`<span>${k}<em>${n}</em></span>`).join('')||'<span>해당 없음</span>')+'</div>';
+  const stc={}; recs.filter(r=>r.category==='불만').forEach(r=>{const k=r.store||'미상';stc[k]=(stc[k]||0)+1;});
+  const stTop=Object.entries(stc).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  h+='<div class="mt-lb">VOC 불만 집중 매장</div><div class="mt-chips">'
+    +(stTop.map(([k,n])=>`<span>${mtTx(k)}<em>${n}</em></span>`).join('')||'<span>해당 없음</span>')+'</div>';
+  if(crit.length) h+=`<div class="mt-crit"><span class="rl">크리티컬</span>${mtTx(crit[0].store||'')} — ${mtTx(crit[0].title||'')}`
+    +(crit.length>1?` 외 ${crit.length-1}건`:'')+'</div>';
   box.innerHTML=h;
 }
-// TOP3 매장별 개선 사항 (②번 뷰의 매장 카드에서 핵심 불만·개선 방안 요약)
+// ── TOP3 매장 개선 카드 (한 줄 요약 + 상세 버튼) ──
 function mtRenderStores(m){
   const top=mtTop3(m), wrap=document.getElementById('mt-stores');
   if(!top.length){ wrap.innerHTML='<div class="mt-c"><div class="mt-empty">해당 월에 표본 10건 이상 매장이 없습니다.</div></div>'; return; }
   wrap.innerHTML = top.map((s,i)=>{
     const n=(NOTE_IDX[s.store]||{})[m];
-    const cz=(n&&n['불만요약'])?n['불만요약'].slice(0,2):[];
-    const act=(n&&n['개선방안'])?n['개선방안'].slice(0,3):[];
-    const done=(n&&n['완료방법'])?n['완료방법']:[];
-    const depts=MT_DEPTS.filter(d=>done.some(x=>x.indexOf(d)>=0)||act.some(x=>x.indexOf(d)>=0));
-    const body = (cz.length||act.length)
-      ? `<div class="mt-lb">핵심 불만</div><ul class="mt-ul cz">${cz.map(x=>`<li>${mtMd(x)}</li>`).join('')||'<li>—</li>'}</ul>`
-        +`<div class="mt-lb">개선 방안</div><ul class="mt-ul act">${act.map(x=>`<li>${mtMd(x)}</li>`).join('')||'<li>—</li>'}</ul>`
-        +(depts.length?`<div class="mt-dept">${depts.map(d=>`<span>${d}</span>`).join('')}</div>`:'')
-      : `<div class="mt-empty">이 달 매장 분석 노트가 없습니다.</div>`;
-    return `<div class="mt-c st"><h4><span class="rk">${i+1}</span>${s.store}`
-      +`<b>${s.brand} · 불만 ${s['불만']}건 / ${fmt(s.total)}건 · ${s['불만율']}%</b></h4>`
-      +`<div class="bd">${body}</div></div>`;
+    const czRaw=n?mtPick(n['불만요약']):null, actRaw=n?mtPick(n['개선방안']):null;
+    const cz=czRaw?mtShort(czRaw,62):'분석 노트 없음';
+    const act=actRaw?mtShort(actRaw,62):'분석 노트 없음';
+    const all=[].concat((n&&n['개선방안'])||[],(n&&n['완료방법'])||[]);
+    const depts=MT_DEPTS.filter(d=>all.some(x=>x.indexOf(d)>=0));
+    return `<div class="mt-c st"><h4><span class="rk">${i+1}</span><span class="nm">${s.store}</span></h4>`
+      +`<div class="mt-st-n"><span class="big">${s['불만']}<small>건</small></span>`
+      +`<span class="sub">불만율 ${s['불만율']}% · 리뷰 ${fmt(s.total)}건 · ${s.brand}</span></div>`
+      +`<div class="mt-f"><span class="k">원인</span><div class="t">${cz}</div></div>`
+      +`<div class="mt-f"><span class="k act">조치</span><div class="t">${act}</div></div>`
+      +`<div class="foot"><span class="mt-dept">${depts.map(d=>`<span>${d}</span>`).join('')}</span>`
+      +`<button class="mt-more" data-mt="store" data-store="${s.store}" style="margin-left:auto">상세 ▸</button></div></div>`;
   }).join('');
 }
+// ── 상세 모달 ──
+function mtModal(title,html){
+  document.getElementById('mt-mtitle').textContent=title;
+  document.getElementById('mt-mbody').innerHTML=html;
+  document.getElementById('mt-modal').classList.add('on');
+}
+function mtDetail(kind,arg,m){
+  const pm=mtPrev(m), t=R.by_month_total[m]||{}, p=pm?(R.by_month_total[pm]||{}):null;
+  const vc=(V&&V.by_month)?V.by_month[m]:null, vp=(V&&V.by_month&&pm)?V.by_month[pm]:null;
+  if(kind==='kpi'){
+    const stCnt=x=>{let n=0;for(const s in R.store_month){const o=R.store_month[s][x];if(o&&o.total)n++;}return n;};
+    const rows=[['리뷰 접수',p?p.total:null,t.total,'건'],['불만 리뷰',p?p['불만']:null,t['불만'],'건'],
+      ['불만율',p?p['불만율']:null,t['불만율'],'%'],['칭찬율',p?p['칭찬율']:null,t['칭찬율'],'%'],
+      ['집계 매장',pm?stCnt(pm):null,stCnt(m),'개'],
+      ['VOC 접수',vp?mtVocSum(vp):null,mtVocSum(vc),'건'],['VOC 불만',vp?(vp['불만']||0):null,vc?(vc['불만']||0):0,'건'],
+      ['VOC 칭찬',vp?(vp['칭찬']||0):null,vc?(vc['칭찬']||0):0,'건'],
+      ['크리티컬',pm?mtCrit(pm).length:null,mtCrit(m).length,'건']];
+    const br=R.by_month_brand[m]||{}, bp=pm?(R.by_month_brand[pm]||{}):{};
+    return mtModal(`지표 상세 · ${pm?pm+' 대비 ':''}${m}`,
+      '<h5>전월 대비 종합</h5><table><thead><tr><th>지표</th><th>'+(pm||'전월')+'</th><th>'+m+'</th><th>증감</th></tr></thead><tbody>'
+      +rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]==null?'–':fmt(r[1])}</td><td><b>${r[2]==null?'–':fmt(r[2])}</b>${r[3]}</td>`
+        +`<td>${r[1]==null||r[2]==null?'–':(Math.round((r[2]-r[1])*10)/10>0?'+':'')+Math.round((r[2]-r[1])*10)/10}</td></tr>`).join('')
+      +'</tbody></table><h5>브랜드별 불만율</h5><table><thead><tr><th>브랜드</th><th>리뷰</th><th>불만</th><th>불만율</th><th>전월</th></tr></thead><tbody>'
+      +R.brands.filter(b=>br[b]).sort((a,b)=>br[b]['불만율']-br[a]['불만율']).map(b=>
+        `<tr><td>${b}</td><td>${fmt(br[b].total)}</td><td>${br[b]['불만']}</td><td><b>${br[b]['불만율']}%</b></td>`
+        +`<td>${bp[b]?bp[b]['불만율']+'%':'–'}</td></tr>`).join('')+'</tbody></table>');
+  }
+  if(kind==='top3'){
+    const all=aggStoreRange(m,m).filter(s=>s.total>=10&&s['불만']>0).slice(0,12);
+    return mtModal(`불만 매장 상세 · ${m}`,
+      '<h5>불만 건수 상위 매장 (표본 10건 이상)</h5><table><thead><tr><th>매장</th><th>브랜드</th><th>리뷰</th><th>불만</th><th>불만율</th></tr></thead><tbody>'
+      +all.sort((a,b)=>b['불만']-a['불만']||b['불만율']-a['불만율']).map(s=>
+        `<tr><td>${s.store}</td><td>${s.brand}</td><td>${fmt(s.total)}</td><td><b>${s['불만']}</b></td><td>${s['불만율']}%</td></tr>`).join('')
+      +'</tbody></table>');
+  }
+  if(kind==='claim'){
+    const kw=((R.by_month_keywords||{})[m]||{}).complaint||[];
+    const recs=mtRecs(m), o={}, st={};
+    recs.forEach(r=>{const k=r.inquiry_type||'미분류';o[k]=(o[k]||0)+1;
+      if(r.category==='불만'){const s=r.store||'미상';st[s]=(st[s]||0)+1;}});
+    const crit=mtCrit(m);
+    return mtModal(`클레임 상세 · ${m}`,
+      '<h5>리뷰 불만 키워드</h5><table><thead><tr><th>키워드</th><th>건수</th></tr></thead><tbody>'
+      +(kw.map(([k,n])=>`<tr><td>${k}</td><td><b>${n}</b></td></tr>`).join('')||'<tr><td>–</td><td>–</td></tr>')
+      +'</tbody></table><h5>VOC 문의유형</h5><table><thead><tr><th>유형</th><th>건수</th></tr></thead><tbody>'
+      +(Object.entries(o).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`<tr><td>${k}</td><td><b>${n}</b></td></tr>`).join('')||'<tr><td>–</td><td>–</td></tr>')
+      +'</tbody></table><h5>VOC 불만 집중 매장</h5><table><thead><tr><th>매장</th><th>건수</th></tr></thead><tbody>'
+      +(Object.entries(st).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,n])=>`<tr><td>${k}</td><td><b>${n}</b></td></tr>`).join('')||'<tr><td>–</td><td>–</td></tr>')
+      +'</tbody></table>'
+      +(crit.length?'<h5>크리티컬 접수</h5><ul>'+crit.map(r=>`<li><b>${mtTx(r.store||'')}</b> — ${mtTx(r.title||'')}</li>`).join('')+'</ul>':''));
+  }
+  if(kind==='store'){
+    const n=(NOTE_IDX[arg]||{})[m], s=mtTop3(m).find(x=>x.store===arg)||{};
+    if(!n) return mtModal(`${arg} · ${m}`,'<div class="mt-empty">이 달 매장 분석 노트가 없습니다.</div>');
+    const sec=(t,arr)=>arr&&arr.length?`<h5>${t}</h5><ul>${arr.map(x=>`<li>${mtMd(x)}</li>`).join('')}</ul>`:'';
+    return mtModal(`${arg} · ${m}`,
+      `<h5>현황</h5><ul><li>불만 <b>${s['불만']||0}건</b> / 리뷰 ${fmt(s.total||0)}건 · 불만율 <b>${s['불만율']||0}%</b></li></ul>`
+      +sec('핵심 불만',n['불만요약'])+sec('개선 방안',n['개선방안'])+sec('부서별 실행 계획',n['완료방법']));
+  }
+}
 function renderMeet(m){
-  mtRenderCmp(m); mtRenderTop3(m); mtRenderKw(m); mtRenderVoc(m); mtRenderStores(m);
-  setTimeout(()=>[charts.mtTop3,charts.mtKw].forEach(c=>c&&c.resize()),30);
+  mtRenderKpis(m); mtRenderTop3(m); mtRenderClaim(m); mtRenderStores(m);
+  setTimeout(()=>charts.mtTop3&&charts.mtTop3.resize(),30);
 }
 function vmeetInit(){
   const sel=document.getElementById('mt-month'); if(!sel) return;
   R.months.slice().reverse().forEach(m=>sel.add(new Option(m,m)));
   sel.value=R.current_month;
   sel.addEventListener('change',()=>renderMeet(sel.value));
+  document.getElementById('vmeet').addEventListener('click',e=>{
+    const b=e.target.closest('.mt-more'); if(!b) return;
+    mtDetail(b.dataset.mt, b.dataset.store||'', sel.value);
+  });
+  const mo=document.getElementById('mt-modal');
+  document.getElementById('mt-mclose').addEventListener('click',()=>mo.classList.remove('on'));
+  mo.addEventListener('click',e=>{ if(e.target===mo) mo.classList.remove('on'); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') mo.classList.remove('on'); });
   renderMeet(sel.value);
 }
-
 /* ---------- tabs & lazy chart init ---------- */
 const built={};
 function build(v){
