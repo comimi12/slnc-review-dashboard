@@ -1196,7 +1196,7 @@ window.SVC_MANUALS = {
 <script>/* manuals_images.js 없음 — 해당 기능은 표시되지 않습니다 */</script>
 <script>
 /* 새 버전 자동 반영: 배포 시 주입된 빌드토큰과 ver.txt(캐시 우회) 비교 → 다르면 최신으로 새로고침 */
-window.__BUILD__='20260908-151645';
+window.__BUILD__='20260908-151934';
 (function(){
   try{
     if(location.protocol==='file:') return;            // 로컬은 패스
@@ -2427,7 +2427,7 @@ function drawTrend(){
   const isR = trendMode==='range', ms = isR?rangeMonths():R.months;
   const a = aggRange(v1From,v1To), avg = rate(a.tot['불만'],a.tot.total);
   charts.trend.setOption({
-    grid:{left:42,right:18,top:isR?32:24,bottom:30},
+    grid:{left:42,right:isR?92:18,top:isR?32:24,bottom:30},
     tooltip:{trigger:'axis'},
     xAxis:{type:'category',data:ms}, yAxis:{type:'value',axisLabel:{formatter:'{value}%'}},
     series:[{name:'전체 불만율',type:isR?'bar':'line',smooth:true,barWidth:'46%',barMaxWidth:64,
@@ -2437,7 +2437,7 @@ function drawTrend(){
       markArea: (!isR&&v1From&&v1To)?{silent:true,itemStyle:{color:'rgba(20,85,155,.08)'},
         data:[[{xAxis:v1From},{xAxis:v1To}]]}:{data:[]},
       markLine: isR?{silent:true,symbol:'none',lineStyle:{color:'#14559b',type:'dashed',width:1.5},
-        label:{formatter:'기간 평균 '+avg+'%',fontSize:11,position:'insideEndTop',color:'#14559b'},
+        label:{formatter:'기간 평균\n'+avg+'%',fontSize:11,lineHeight:14,position:'end',color:'#14559b',align:'left',padding:[0,0,0,4]},
         data:[{yAxis:avg}]}:{data:[]}}]
   }, true);
 }
