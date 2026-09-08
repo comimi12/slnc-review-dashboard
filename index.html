@@ -1196,7 +1196,7 @@ window.SVC_MANUALS = {
 <script>/* manuals_images.js 없음 — 해당 기능은 표시되지 않습니다 */</script>
 <script>
 /* 새 버전 자동 반영: 배포 시 주입된 빌드토큰과 ver.txt(캐시 우회) 비교 → 다르면 최신으로 새로고침 */
-window.__BUILD__='20260908-151934';
+window.__BUILD__='20260908-152834';
 (function(){
   try{
     if(location.protocol==='file:') return;            // 로컬은 패스
@@ -2227,12 +2227,11 @@ window.__BUILD__='20260908-151934';
       <div class="panel"><h3><span>전체 불만율 그래프</span>
         <span class="seg seg-sm" id="trend-mode"><button data-m="month" class="on">월별</button><button data-m="range">기간별</button></span></h3>
         <div class="chart" id="c-trend"></div></div>
-      <div class="panel"><h3><span>브랜드별 불만율 그래프</span>
+      <div class="panel"><h3><span>브랜드별 불만율 <span class="note" id="v1-mlabel"></span></span>
         <span class="seg seg-sm" id="trendbrand-mode"><button data-m="month" class="on">월별</button><button data-m="range">기간별</button></span></h3>
         <div class="chart" id="c-trendbrand"></div></div>
     </div>
     <p class="ctrl-note" style="margin:-6px 2px 14px;line-height:1.5">※ <b>2025년</b>은 팀 월간 분석 워크북의 <b>브랜드·월 집계</b> 기준(매장 단위·리뷰 원문 없음 → 매장 랭킹·드릴다운은 2026년~), <b>2026년</b>은 리뷰 원문 집계 기준. 분류 방식 차이로 2025년 불만율이 다소 높게 표기될 수 있습니다.</p>
-    <div class="panel" style="margin-bottom:14px"><h3>브랜드별 불만율 <span class="note" id="v1-mlabel"></span></h3><div class="chart" id="c-brandrate"></div></div>
     <div class="panel" style="margin-bottom:14px"><h3><span>매장 리뷰 랭킹</span>
         <span style="display:flex;align-items:center;gap:7px">
           <span class="seg" id="store-sort">
@@ -2444,17 +2443,31 @@ function drawTrend(){
 function drawTrendBrand(){
   if(!charts.trendbrand||!v1From) return;
   segOn('trendbrand-mode',trendBrandMode);
-  const isR = trendBrandMode==='range', ms = isR?rangeMonths():R.months;
-  const val=(m,b)=>{const o=(R.by_month_brand[m]||{})[b];return o?o['불만율']:0;};
+  if(trendBrandMode==='range'){
+    // 기간별 — 선택 기간을 브랜드별로 합산한 불만율(+불만 건수)
+    const br=aggRange(v1From,v1To).br;
+    charts.trendbrand.setOption({
+      grid:{left:42,right:18,top:28,bottom:30},
+      tooltip:{trigger:'item',formatter:p=>`${p.name}<br/>불만율 <b>${p.value}%</b><br/>불만 ${p.data.bad}건 / 총 ${fmt(p.data.tot)}건`},
+      legend:{show:false},
+      xAxis:{type:'category',data:R.brands}, yAxis:{type:'value',axisLabel:{formatter:'{value}%'}},
+      series:[{type:'bar',barWidth:'52%',
+        data:R.brands.map(b=>({name:b,value:rate(br[b]['불만'],br[b].total),bad:br[b]['불만'],tot:br[b].total,
+          itemStyle:{color:BRAND_COLOR[b]}})),
+        label:{show:true,position:'top',fontSize:11,lineHeight:14,formatter:p=>`${p.value}%\n${p.data.bad}건`}}]
+    }, true);
+    return;
+  }
+  // 월별 — 브랜드별 월 추이
+  const ms=R.months, val=(m,b)=>{const o=(R.by_month_brand[m]||{})[b];return o?o['불만율']:0;};
   charts.trendbrand.setOption({
     grid:{left:42,right:14,top:34,bottom:28},
     tooltip:{trigger:'axis',valueFormatter:v=>v+'%'},
     legend:{top:0,type:'scroll',itemWidth:12,itemHeight:8,textStyle:{fontSize:11}},
     xAxis:{type:'category',data:ms}, yAxis:{type:'value',axisLabel:{formatter:'{value}%'}},
-    series:R.brands.map(b=>({name:b,type:isR?'bar':'line',smooth:true,symbolSize:5,barMaxWidth:38,
+    series:R.brands.map(b=>({name:b,type:'line',smooth:true,symbolSize:5,
       data:ms.map(m=>val(m,b)),
-      itemStyle:{color:BRAND_COLOR[b]},lineStyle:{color:BRAND_COLOR[b]},
-      label:(isR&&ms.length<=3)?{show:true,position:'top',formatter:'{c}%',fontSize:10}:{show:false}}))
+      itemStyle:{color:BRAND_COLOR[b]},lineStyle:{color:BRAND_COLOR[b]}}))
   }, true);
 }
 function renderV1(fromM,toM){
@@ -2492,15 +2505,6 @@ function renderV1(fromM,toM){
     ${tSrc}${tTop3}${tKw}`;
   document.getElementById('v1-range').textContent = '';
   document.getElementById('v1-mlabel').textContent = single?fromM:`${fromM}~${toM}`;
-  // 브랜드별 불만율 (+ 불만 건수)
-  charts.brandrate.setOption({
-    grid:{left:42,right:18,top:28,bottom:30},
-    tooltip:{trigger:'item',formatter:p=>`${p.name}<br/>불만율 <b>${p.value}%</b><br/>불만 ${p.data.bad}건 / 총 ${p.data.tot}건`},
-    xAxis:{type:'category',data:R.brands}, yAxis:{type:'value',axisLabel:{formatter:'{value}%'}},
-    series:[{type:'bar',barWidth:'52%',
-      data:R.brands.map(b=>({value:rate(a.br[b]['불만'],a.br[b].total),bad:a.br[b]['불만'],tot:a.br[b].total,itemStyle:{color:BRAND_COLOR[b]}})),
-      label:{show:true,position:'top',fontSize:11,lineHeight:14,formatter:p=>`${p.value}%\n${p.data.bad}건`}}]
-  });
   // 추세 차트: 월별(전체 추이·선택 구간 음영) / 기간별(선택 구간만 집계)
   v1From=fromM; v1To=toM;
   drawTrend(); drawTrendBrand();
@@ -2511,7 +2515,6 @@ function renderV1(fromM,toM){
 function v1charts(){
   charts.trend = echarts.init(document.getElementById('c-trend'));
   charts.trendbrand = echarts.init(document.getElementById('c-trendbrand'));
-  charts.brandrate = echarts.init(document.getElementById('c-brandrate'));
   // 월별/기간별 전환 버튼
   document.querySelectorAll('#trend-mode button').forEach(b=>b.addEventListener('click',()=>{
     trendMode=b.dataset.m; drawTrend();
